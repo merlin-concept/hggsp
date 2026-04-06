@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HGGSP — Base de révision</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --bg2: #efece4;
+    --white: #ffffff;
+    --text: #1a1814;
+    --text2: #5a5650;
+    --text3: #9a9690;
+    --accent1: #2d5a8e;
+    --accent2: #8b3a3a;
+    --accent3: #3a6b4a;
+    --accent4: #7a5c2e;
+    --border: #d8d4c8;
+    --border2: #c8c4b8;
+    --tag-bg: #e8e4d8;
+    --flash-front: #2d5a8e;
+    --flash-back: #1a1814;
+    --yellow: #f5e6c0;
+    --yellow-dark: #b8a060;
+    --green-light: #e0ede4;
+    --red-light: #f0e0e0;
+    --blue-light: #deeaf5;
+    --purple-light: #ece0f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  /* ===== HEADER ===== */
+  header {
+    background: var(--text);
+    color: var(--white);
+    padding: 2rem 2.5rem 1.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  header .subtitle {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 300;
+  }
+  header .stats {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #ccc;
+  }
+  .stat-pill strong { color: white; }
+
+  /* ===== NAV ===== */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-btn {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--text); border-bottom-color: var(--text); }
+
+  /* ===== MAIN ===== */
+  main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== THEME BLOCKS ===== */
+  .theme-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .theme-number {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 3.5rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--border2);
+    flex-shrink: 0;
+    width: 60px;
+  }
+  .theme-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .theme-question {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ===== AXE ===== */
+  .axe {
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .axe-header {
+    padding: 1rem 1.4rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .axe-header:hover { background: var(--bg2); }
+  .axe-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .axe-tag.t2 { background: #deeaf5; color: #1a4a7a; }
+  .axe-tag.t3 { background: #f0e8dc; color: #7a4a1a; }
+  .axe-tag.t5 { background: #deeae0; color: #1a5a2a; }
+  .axe-tag.otc { background: #e8dcea; color: #5a2a7a; }
+  .axe-name {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+  }
+  .axe-toggle { color: var(--text3); font-size: 18px; transition: transform 0.2s; }
+  .axe.open .axe-toggle { transform: rotate(180deg); }
+  .axe-body { display: none; }
+  .axe.open .axe-body { display: block; }
+
+  /* ===== JALON ===== */
+  .jalon {
+    padding: 1.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .jalon:last-child { border-bottom: none; }
+  .jalon-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .jalon-num {
+    background: var(--text);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .jalon-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+  }
+  .jalon-toggle { color: var(--text3); font-size: 14px; transition: transform 0.2s; }
+  .jalon.open .jalon-toggle { transform: rotate(180deg); }
+  .jalon-content { display: none; }
+  .jalon.open .jalon-content { display: block; }
+
+  /* ===== REPERES (timeline entries) ===== */
+  .reperes-list { margin: 0 0 1.2rem; }
+  .repere {
+    display: flex;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--bg2);
+    align-items: baseline;
+    font-size: 14px;
+  }
+  .repere:last-child { border-bottom: none; }
+  .repere-date {
+    font-weight: 600;
+    color: var(--accent1);
+    min-width: 80px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+  .repere-date.key { color: var(--accent2); }
+  .repere-text { color: var(--text2); line-height: 1.5; }
+  .repere-text strong { color: var(--text); font-weight: 500; }
+
+  /* ===== NOTIONS ===== */
+  .notions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+    margin: 0 0 1.2rem;
+  }
+  .notion-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .notion-term {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .notion-def { color: var(--text2); line-height: 1.5; }
+
+  /* ===== ENJEUX ===== */
+  .enjeux-list { margin: 0 0 1.2rem; }
+  .enjeu {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 14px;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--bg2);
+  }
+  .enjeu:last-child { border-bottom: none; }
+  .enjeu-icon { color: var(--accent3); flex-shrink: 0; margin-top: 2px; font-size: 12px; }
+  .enjeu-text { color: var(--text2); line-height: 1.5; }
+  .enjeu-text strong { color: var(--text); font-weight: 500; }
+
+  /* ===== SYNTHESE BLOCK ===== */
+  .synthese-block {
+    background: var(--yellow);
+    border: 1px solid var(--yellow-dark);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #4a3a1a;
+    margin: 0 0 1.2rem;
+    line-height: 1.6;
+  }
+  .synthese-block strong { color: #2a1a00; }
+
+  /* ===== SECTION LABELS ===== */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    margin: 1rem 0 8px;
+  }
+
+  /* ===== FLASHCARDS VIEW ===== */
+  .flash-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .flash-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    background: var(--white);
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+  .flash-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    background: var(--white);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 0.12s;
+  }
+  .flash-btn:hover { background: var(--bg2); }
+  .flash-btn.primary { background: var(--text); color: white; border-color: var(--text); }
+  .flash-btn.primary:hover { background: #333; }
+  .flash-progress {
+    font-size: 13px;
+    color: var(--text2);
+    margin-left: auto;
+  }
+  .flash-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .flashcard {
+    width: 100%;
+    max-width: 640px;
+    min-height: 240px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    transition: transform 0.08s;
+    user-select: none;
+  }
+  .flashcard:hover { transform: translateY(-2px); }
+  .flashcard:active { transform: translateY(0); }
+  .card-side-label {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+  }
+  .card-theme-tag {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .card-question {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .card-answer {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.7;
+    display: none;
+  }
+  .card-hint {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 1rem;
+  }
+  .flashcard.revealed .card-question { color: var(--text2); font-size: 13px; font-family: 'DM Sans', sans-serif; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+  .flashcard.revealed .card-answer { display: block; }
+  .flashcard.revealed .card-hint { display: none; }
+  .flash-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .flash-score {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 1rem;
+  }
+  .score-ok { color: var(--accent3); font-weight: 600; }
+  .score-ko { color: var(--accent2); font-weight: 600; }
+
+  /* ===== CHRONOLOGIE VIEW ===== */
+  .chron-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .chron-tag-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border2);
+    background: var(--white);
+    cursor: pointer;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+  .chron-tag-btn:hover, .chron-tag-btn.active { background: var(--text); color: white; border-color: var(--text); }
+  .timeline {
+    position: relative;
+    padding-left: 80px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 60px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border2);
+  }
+  .tl-entry {
+    position: relative;
+    margin-bottom: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .tl-entry::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border2);
+    border: 1.5px solid var(--white);
+    outline: 1px solid var(--border2);
+  }
+  .tl-entry.key::before { background: var(--accent2); outline-color: var(--accent2); }
+  .tl-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    position: absolute;
+    left: -80px;
+    width: 52px;
+    text-align: right;
+    top: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .tl-date.key { color: var(--accent2); }
+  .tl-text { color: var(--text2); line-height: 1.5; }
+  .tl-text strong { color: var(--text); font-weight: 500; }
+  .tl-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .tl-badge.t2 { background: #deeaf5; color: #1a4a7a; }
+  .tl-badge.t3 { background: #f0e8dc; color: #7a4a1a; }
+  .tl-badge.t5 { background: #deeae0; color: #1a5a2a; }
+
+  /* ===== ACCUEIL ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 1.5rem;
+  }
+  .home-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .home-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .home-card-num {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--border2);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .home-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .home-card-sub { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .home-card-count {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .info-banner {
+    background: var(--blue-light);
+    border: 1px solid #b0c8e8;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #1a3a5a;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  .info-banner strong { color: #0a2a4a; }
+
+  .divider-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.5rem 0 1rem;
+  }
+  .divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    header { padding: 1.2rem; }
+    header h1 { font-size: 1.4rem; }
+    main { padding: 1rem 1rem 3rem; }
+    .theme-number { font-size: 2.5rem; width: 44px; }
+    .theme-title { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>HGGSP — Révision Bac</h1>
+    <div class="subtitle">Terminale · Thèmes 2, 3 et 5 · Base construite depuis vos notes de cours</div>
+  </div>
+  <div class="stats">
+    <div class="stat-pill"><strong>3</strong> thèmes</div>
+    <div class="stat-pill"><strong>6</strong> axes</div>
+    <div class="stat-pill"><strong>3</strong> OTC</div>
+    <div class="stat-pill"><strong>60+</strong> flashcards</div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showView('home')">Accueil</button>
+  <button class="nav-btn" onclick="showView('t3')">Thème 3 — Histoire &amp; Mémoires</button>
+  <button class="nav-btn" onclick="showView('t5')">Thème 5 — Environnement</button>
+  <button class="nav-btn" onclick="showView('t2')">Thème 2 — Guerre &amp; Paix</button>
+  <button class="nav-btn" onclick="showView('chron')">Chronologie</button>
+  <button class="nav-btn" onclick="showView('flash')">Flashcards</button>
+</nav>
+
+<main>
+
+<!-- ========== ACCUEIL ========== -->
+<div id="view-home" class="view active">
+  <div class="info-banner">
+    <strong>Épreuve de 4h en deux parties :</strong> (1) Question problématisée sur un axe — rédiger une réponse structurée avec repères, notions et exemples ; (2) Étude critique de documents — analyser, contextualiser, mettre en perspective. Ne pas faire de hors-sujet : identifiez toujours le jalon demandé.
+  </div>
+
+  <div class="divider-label">Thèmes au programme</div>
+  <div class="home-grid">
+    <div class="home-card" onclick="showView('t3')">
+      <div class="home-card-num">3</div>
+      <div class="home-card-title">Histoire et mémoires</div>
+      <div class="home-card-sub">Histoire des conflits · Mémoire et justice · Génocide des Juifs et Tsiganes</div>
+      <div class="home-card-count">2 axes + 1 OTC · 3 jalons OTC</div>
+    </div>
+    <div class="home-card" onclick="showView('t5')">
+      <div class="home-card-num">5</div>
+      <div class="home-card-title">Environnement</div>
+      <div class="home-card-sub">Exploitation et protection · Changement climatique · USA et environnement</div>
+      <div class="home-card-count">2 axes + 1 OTC · 2 jalons OTC</div>
+    </div>
+    <div class="home-card" onclick="showView('t2')">
+      <div class="home-card-num">2</div>
+      <div class="home-card-title">Faire la guerre, faire la paix</div>
+      <div class="home-card-sub">Dimension géopolitique · Construction de la paix · Guerres irrégulières</div>
+      <div class="home-card-count">2 axes · pas d'OTC</div>
+    </div>
+  </div>
+
+  <div class="divider-label">Outils de révision</div>
+  <div class="home-grid">
+    <div class="home-card" onclick="showView('flash')">
+      <div class="home-card-num" style="color:#8b3a3a;">✦</div>
+      <div class="home-card-title">Flashcards</div>
+      <div class="home-card-sub">Questions / réponses sur les notions clés, les repères et les acteurs. Filtrez par thème.</div>
+      <div class="home-card-count">60+ cartes · auto-test</div>
+    </div>
+    <div class="home-card" onclick="showView('chron')">
+      <div class="home-card-num" style="color:#3a6b4a;">↓</div>
+      <div class="home-card-title">Chronologie générale</div>
+      <div class="home-card-sub">Tous les repères chronologiques du programme sur une frise filtrée par thème.</div>
+      <div class="home-card-count">80+ dates · filtrable</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== THÈME 3 ========== -->
+<div id="view-t3" class="view">
+  <div class="theme-header">
+    <div class="theme-number">3</div>
+    <div>
+      <div class="theme-title">Histoire et mémoires</div>
+      <div class="theme-question">Comment l'histoire s'inscrit-elle dans les mémoires ? Comment les conflits s'inscrivent-ils dans l'histoire et les mémoires des populations ?</div>
+    </div>
+  </div>
+
+  <!-- AXE 1 -->
+  <div class="axe open">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t3">Axe 1</span>
+      <span class="axe-name">Histoire et mémoires des conflits</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <!-- Jalon 1 -->
+      <div class="jalon open">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">Un débat historique et ses implications politiques : les causes de la Première Guerre mondiale</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Repères chronologiques</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1914</span><span class="repere-text"><strong>Déclenchement de la Première Guerre mondiale</strong> — guerre interétatique, symétrique, d'abord limitée puis absolue</span></div>
+            <div class="repere"><span class="repere-date key">1919</span><span class="repere-text"><strong>Traité de Versailles</strong> — article 231 impose à l'Allemagne la responsabilité de la guerre → débat historiographique ouvert depuis cette date</span></div>
+            <div class="repere"><span class="repere-date">1961</span><span class="repere-text"><strong>Fritz Fischer</strong> publie sa thèse : 1er historien allemand à défier la version officielle, démontre la responsabilité centrale de l'Allemagne dans l'engrenage de 1914. Remet en cause toute l'historiographie allemande.</span></div>
+            <div class="repere"><span class="repere-date">2012-2014</span><span class="repere-text"><strong>Christopher Clark</strong> (australien) — <em>Les Somnambules</em> : responsabilité partagée de toutes les puissances européennes. <strong>Herfried Münkler</strong> (allemand) : insiste sur la multicausalité à l'occasion du centenaire</span></div>
+          </div>
+
+          <div class="section-label">Notions clés</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Historiographie</div>
+              <div class="notion-def">Ensemble des travaux historiques produits sur un sujet — façon de construire et d'écrire l'histoire. Les historiens cherchent les contradictions et les manques.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Brutalisation (G. Mosse, 1990)</div>
+              <div class="notion-def">Banalisation de la violence après la Première Guerre mondiale qui tend à s'imprégner des sociétés. Se répand dans les États vaincus ou déçus des traités de paix.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Multicausalité (historiographie dominante)</div>
+              <div class="notion-def">Décisions politiques des élites + engrenage diplomatique + nationalismes + cultures de guerre → la Grande Guerre comme produit d'une Europe en crise.</div>
+            </div>
+          </div>
+
+          <div class="synthese-block">
+            <strong>À retenir :</strong> Depuis 1919, le débat se pose ainsi — responsabilité centrale de l'Allemagne (Fischer) <em>vs</em> responsabilité partagée de toutes les puissances (Clark). Aujourd'hui, l'historiographie dominante met en avant une <strong>multicausalité</strong> : les acteurs ont agi sans mesurer la gravité de leurs choix. Ce débat a des <strong>implications politiques directes</strong> (identité allemande, réconciliation franco-allemande, mémoire nationale).
+          </div>
+        </div>
+      </div>
+
+      <!-- Jalon 2 -->
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Mémoires et histoire d'un conflit : la guerre d'Algérie</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Repères chronologiques</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date">1830</span><span class="repere-text">Conquête de l'Algérie par la France (principale colonie de peuplement)</span></div>
+            <div class="repere"><span class="repere-date key">8 mai 1945</span><span class="repere-text"><strong>Massacres de Sétif, Guelma et Kherrata</span></strong></div>
+            <div class="repere"><span class="repere-date key">1er nov. 1954</span><span class="repere-text">La <strong>« Toussaint rouge »</strong> — attentats indépendantistes du FLN, début de la guerre d'Algérie</span></div>
+            <div class="repere"><span class="repere-date">janv-oct 1957</span><span class="repere-text">Bataille d'Alger</span></div>
+            <div class="repere"><span class="repere-date key">13 mai 1958</span><span class="repere-text">Insurrection à Alger contre l'investiture de Pflimlin — des Français d'Algérie prennent d'assaut les monuments</span></div>
+            <div class="repere"><span class="repere-date key">1er juin 1958</span><span class="repere-text"><strong>Charles de Gaulle</strong> investi président du Conseil. Obtient les pleins pouvoirs le 3 juin. 4 juin : « Je vous ai compris » à Alger. Passage de la IV<sup>e</sup> à la V<sup>e</sup> République.</span></div>
+            <div class="repere"><span class="repere-date key">17 oct. 1961</span><span class="repere-text"><strong>Répression</strong> d'une manifestation d'Algériens à Paris — plus de 50 morts, des centaines de blessés. Maurice Papon, préfet de police (nommé par de Gaulle).</span></div>
+            <div class="repere"><span class="repere-date key">19 mars 1962</span><span class="repere-text">Application des <strong>accords d'Évian</strong> — cessez-le-feu + référendum sur l'autodétermination</span></div>
+            <div class="repere"><span class="repere-date key">5 juil. 1962</span><span class="repere-text"><strong>Indépendance de l'Algérie</strong> — exode des pieds-noirs, massacre des Harkis en Algérie</span></div>
+            <div class="repere"><span class="repere-date">1992</span><span class="repere-text">Ouverture des archives publiques en France</span></div>
+            <div class="repere"><span class="repere-date">1999</span><span class="repere-text">Loi reconnaissant l'appellation de <strong>« guerre d'Algérie »</strong> en France</span></div>
+            <div class="repere"><span class="repere-date">2022</span><span class="repere-text">Inauguration à Paris du <strong>mémorial</strong> de la guerre d'Algérie et des combats du Maroc et de la Tunisie</span></div>
+            <div class="repere"><span class="repere-date">2021</span><span class="repere-text">Rapport de l'historien <strong>B. Stora</strong> sur les questions mémorielles (colonisation et guerre d'Algérie) remis à E. Macron</span></div>
+          </div>
+
+          <div class="section-label">Notions clés</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">FLN — Front de Libération Nationale</div>
+              <div class="notion-def">Organisation pour l'indépendance de l'Algérie. Branche armée : ALN (Armée de Libération Nationale). Parti politique unique depuis 1962, encore influent.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Appelés du contingent</div>
+              <div class="notion-def">Soldats français non professionnels effectuant leur service militaire obligatoire en Algérie (jusqu'à 22 mois).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Pieds-noirs</div>
+              <div class="notion-def">Français d'Algérie rapatriés en métropole après 1962.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Harkis</div>
+              <div class="notion-def">Soldats algériens supplétifs de l'armée française — massacrés en Algérie après l'indépendance.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">OAS — Organisation de l'Armée Secrète</div>
+              <div class="notion-def">Pour le maintien de l'Algérie française. 22 août 1962 : attentat du Petit-Clamart contre de Gaulle.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Messali Hadj</div>
+              <div class="notion-def">Combattant pour l'indépendance de l'Algérie — précurseur du nationalisme algérien.</div>
+            </div>
+          </div>
+
+          <div class="section-label">Mémoires plurielles et conflictuelles</div>
+          <div class="enjeux-list">
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Mémoire algérienne (FLN)</strong> : héroïsation des combattants, mise en évidence des souffrances par les combattants de l'ALN</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Mémoire française</strong> : usage de la torture longtemps passé sous silence. Mémoires des pieds-noirs, des Harkis non reconnues.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Raphaëlle Branche</strong> (historienne) : <em>La torture et l'Armée pendant la guerre d'Algérie 1954-1962</em> (2001) — montre que la torture par l'armée française n'était pas marginale mais s'inscrivait dans une politique destinée à conserver l'Algérie française.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Instrumentalisation mémorielle</strong> : le FLN utilise la mémoire pour légitimer son pouvoir — vision simplificatrice ne montrant pas les courants différents parmi les nationalistes.</span></div>
+          </div>
+
+          <div class="synthese-block">
+            <strong>Mécanisme à comprendre :</strong> La mémoire de la guerre d'Algérie suscite des mémoires différentes (Algériens, pieds-noirs, Harkis, appelés, armée française) qui sont encore en tension. L'histoire scientifique, construite par les historiens depuis l'ouverture des archives (1992), permet de dépasser ces mémoires divergentes — mais la <strong>reconnaissance officielle</strong> reste un enjeu politique franco-algérien.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AXE 2 -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t3">Axe 2</span>
+      <span class="axe-name">Histoire, mémoire et justice</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <!-- Jalon 1 -->
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">La justice à l'échelle locale : les tribunaux Gacaca face au génocide des Tutsis</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Chronologie du génocide rwandais</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date">1897</span><span class="repere-text">Protectorat allemand sur le Rwanda</span></div>
+            <div class="repere"><span class="repere-date">1916</span><span class="repere-text">Début de l'occupation belge</span></div>
+            <div class="repere"><span class="repere-date">1962</span><span class="repere-text"><strong>Indépendance</strong> du Rwanda</span></div>
+            <div class="repere"><span class="repere-date">1973</span><span class="repere-text">Coup d'État du Hutu <strong>Habyarimana</strong></span></div>
+            <div class="repere"><span class="repere-date">1993</span><span class="repere-text">Accords entre le gouvernement rwandais et le FPR pour le retour de la paix</span></div>
+            <div class="repere"><span class="repere-date key">6 avril 1994</span><span class="repere-text"><strong>Attentat contre le président Habyarimana</strong> → début du génocide des Tutsis par les Hutus</span></div>
+            <div class="repere"><span class="repere-date key">4 juil. 1994</span><span class="repere-text">Prise de pouvoir du <strong>FPR</strong> (Front Patriotique Rwandais) → fin des tueries</span></div>
+            <div class="repere"><span class="repere-date key">nov. 1994</span><span class="repere-text">Création du <strong>TPIR</strong>** (Tribunal Pénal International pour le Rwanda) en Tanzanie (Arusha)</span></div>
+            <div class="repere"><span class="repere-date key">2002-2012</span><span class="repere-text">Mise en place des <strong>tribunaux Gacaca</strong> — le TPIR est déchargé d'une partie des affaires</span></div>
+            <div class="repere"><span class="repere-date">2024</span><span class="repere-text">Commémorations — 30 ans après le génocide. Paul Kagame réélu président pour un 4<sup>e</sup> mandat avec +99% des voix (dictature peu pluraliste)</span></div>
+          </div>
+
+          <div class="section-label">Bilan humain</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date" style="color:var(--accent2)">Victimes</span><span class="repere-text"><strong>800 000</strong> morts dont <strong>77%</strong> de la population tutsi</span></div>
+            <div class="repere"><span class="repere-date" style="color:var(--accent2)">Génocidaires</span><span class="repere-text"><strong>175 000</strong> (ou +) participants actifs — soit <strong>7-8%</strong> de la population hutue</span></div>
+          </div>
+
+          <div class="section-label">Les tribunaux Gacaca — fonctionnement</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Gacaca* (mot kinyarwanda)</div>
+              <div class="notion-def">Justice organisée et rendue par des citoyens, où les victimes rescapées peuvent directement s'exprimer. Juges non professionnels — risque de pressions. Ont permis de juger près de 900 000 personnes en quelques années.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Lois d'amnistie</div>
+              <div class="notion-def">Lois qui suppriment les sanctions et les poursuites — impression que l'on nie la souffrance des victimes mais aussi qu'on donne l'impunité aux bourreaux.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Embrigadement</div>
+              <div class="notion-def">Processus consistant à faire en sorte qu'une large part de la population se mette à penser d'une certaine façon — manipulation des foules par des discours de haine.</div>
+            </div>
+          </div>
+
+          <div class="synthese-block">
+            <strong>Enjeux des Gacaca :</strong> Justice rapide et locale, mais juges non-professionnels + pressions possibles. Les Gacaca ont permis de rendre justice à grande échelle ET de <strong>construire la mémoire collective</strong> (témoignages, responsabilités établies). Comme les prisons étaient insuffisantes, système de conversion en travaux d'intérêt général. La justice permet aussi de <strong>construire l'histoire</strong> : les historiens obtiennent des infos sur le déroulement des faits (ex : Hélène Dumas, fréquemment invitée dans les procès de génocidaires réfugiés en France).
+          </div>
+        </div>
+      </div>
+
+      <!-- Jalon 2 -->
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">La construction d'une justice pénale internationale : le TPIY face aux crimes de masse en ex-Yougoslavie</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Repères</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1993</span><span class="repere-text">Création du <strong>TPIY</strong> (Tribunal Pénal International pour l'ex-Yougoslavie) à La Haye</span></div>
+            <div class="repere"><span class="repere-date">1993-2017</span><span class="repere-text">Fonctionnement du TPIY à La Haye. Karadžić jugé : nie avoir donné des ordres conduisant aux massacres de Bosniaques entre 1992 et 1995.</span></div>
+            <div class="repere"><span class="repere-date key">2002</span><span class="repere-text">Création de la <strong>CPI</strong> (Cour Pénale Internationale) — siège permanent pour juger les crimes de guerre et crimes contre l'humanité</span></div>
+            <div class="repere"><span class="repere-date">1994-2015</span><span class="repere-text">TPIR à Arusha (Tanzanie) pour le Rwanda</span></div>
+          </div>
+          <div class="section-label">Notions clés</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">TPIY / TPIR</div>
+              <div class="notion-def">Tribunaux d'exception créés par l'ONU pour juger certains crimes précisément définis par une loi spécifique. Installés hors du pays des crimes pour garantir la neutralité.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Tribunaux d'exception</div>
+              <div class="notion-def">Tribunaux créés pour juger certains crimes précisément définis par une loi spécifique, car la justice classique est inadaptée aux crimes de masse.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">FPR* (Rwanda)</div>
+              <div class="notion-def">Front Patriotique Rwandais — parti politique créé en Ouganda en 1987 par les exilés tutsis. Prend le pouvoir le 4 juillet 1994 et met fin aux tueries.</div>
+            </div>
+          </div>
+          <div class="synthese-block">
+            <strong>Double rôle de la justice internationale :</strong> (1) Ne pas laisser les principaux responsables impunis ; (2) Éviter que les responsables ne corrompent la justice de leur propre État. Les tribunaux locaux (Gacaca) complètent en jugeant les acteurs locaux avec une meilleure connaissance des contextes. <strong>La justice construit la mémoire</strong> (témoignages) et <strong>construit l'histoire</strong> (informations précieuses sur le déroulement des faits).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTC -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag otc">OTC</span>
+      <span class="axe-name">L'histoire et les mémoires du génocide des Juifs et des Tsiganes</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">Lieux de mémoire du génocide des Juifs et des Tsiganes</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Lieux et commémorations</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date">1945</span><span class="repere-text">Les Soviétiques découvrent le camp d'Auschwitz le <strong>27 janvier</strong></span></div>
+            <div class="repere"><span class="repere-date">1947</span><span class="repere-text">Le <strong>musée d'Auschwitz</strong> ouvre le 14 juin — lieu de mémoire et de concentration</span></div>
+            <div class="repere"><span class="repere-date">1953</span><span class="repere-text"><strong>Yad Vashem</strong> ouvre à Jérusalem — centre mondial de documentation, recherche, éducation et commémoration de la Shoah</span></div>
+            <div class="repere"><span class="repere-date">1956</span><span class="repere-text">Mémorial du martyr juif inconnu inauguré à Paris → devient le <strong>Mémorial de la Shoah</strong> en 2005</span></div>
+            <div class="repere"><span class="repere-date key">1993</span><span class="repere-text">La journée du <strong>16 juillet</strong> rappelant la Rafle du Vél d'Hiv (16/07/1942) devient journée de la mémoire des persécutions racistes et antisémites</span></div>
+            <div class="repere"><span class="repere-date key">27 janv.</span><span class="repere-text">Journée de la découverte d'Auschwitz → Conseil de l'Europe : <strong>journée de la mémoire de l'Holocauste</strong></span></div>
+            <div class="repere"><span class="repere-date">2012</span><span class="repere-text">Angela Merkel inaugure à Berlin un monument dédié aux victimes tsiganes</span></div>
+            <div class="repere"><span class="repere-date">Stolpersteine</span><span class="repere-text">Pavés avec une face en laiton placés devant les maisons où résidaient des personnes juives ou tsiganes déportées</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Juger les crimes nazis après Nuremberg</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Chronologie judiciaire</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">nov. 1945 – oct. 1946</span><span class="repere-text"><strong>Procès de Nuremberg</strong> — juge les hauts dignitaires nazis. Suivi de 12 autres procès (1946-1949). La destruction des preuves rend le travail des enquêteurs complexe.</span></div>
+            <div class="repere"><span class="repere-date key">1961</span><span class="repere-text">Procès d'<strong>Adolf Eichmann</strong> à Jérusalem (capturé par le Mossad en Argentine). Pour Hannah Arendt : la « banalité du mal ». Pour Annette Wieviorka : fin du « grand silence ».</span></div>
+            <div class="repere"><span class="repere-date">1962</span><span class="repere-text">Génocide des Juifs étudié dans les programmes scolaires de la RFA</span></div>
+            <div class="repere"><span class="repere-date">1987</span><span class="repere-text"><strong>Klaus Barbie</strong> (chef de la Gestapo de Lyon) jugé et condamné à perpétuité en Gironde</span></div>
+            <div class="repere"><span class="repere-date key">1995</span><span class="repere-text"><strong>Jacques Chirac reconnaît la responsabilité de l'État français</strong> dans la rafle du Vél d'Hiv. Travail de reconnaissance qui se poursuit : en 2011, l'UE reconnaît le génocide des Tsiganes.</span></div>
+            <div class="repere"><span class="repere-date">1998</span><span class="repere-text"><strong>Maurice Papon</strong> condamné à 10 ans de réclusion</span></div>
+          </div>
+          <div class="section-label">Notions</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Imprescriptibilité</div>
+              <div class="notion-def">Les crimes contre l'humanité ne se prescrivent pas — même 40 ans après, les responsables peuvent être jugés.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Mythe résistancialiste</div>
+              <div class="notion-def">Terme forgé par Henry Rousso — mythe selon lequel la majorité des Français aurait résisté pendant l'Occupation. La IV<sup>e</sup> République entretient ce mythe pour faire oublier la collaboration de Vichy.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J3</span>
+          <span class="jalon-title">Le génocide dans la littérature et le cinéma</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Œuvres majeures — Littérature</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date">1947</span><span class="repere-text"><strong>Primo Levi</strong> — <em>Si c'est un homme</em> : tirage confidentiel en 1947, traduit en français seulement en 1987</span></div>
+            <div class="repere"><span class="repere-date">1947</span><span class="repere-text"><strong>Journal d'Anne Frank</strong> — succès international dès 1963</span></div>
+            <div class="repere"><span class="repere-date">1978</span><span class="repere-text"><strong>William Styron</strong> — <em>Le choix de Sophie</em></span></div>
+            <div class="repere"><span class="repere-date">2006</span><span class="repere-text"><strong>Jonathan Littel</strong> — <em>Les Bienveillantes</em></span></div>
+            <div class="repere"><span class="repere-date">BD</span><span class="repere-text"><strong>Maus</strong> d'Art Spiegelman — histoire du père rescapé d'Auschwitz, difficultés de transmission de la mémoire</span></div>
+          </div>
+          <div class="section-label">Œuvres majeures — Cinéma</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date">1956</span><span class="repere-text"><strong>Nuit et brouillard</strong> (Alain Resnais) — documentaire sur les camps, mais caractère racial peu souligné</span></div>
+            <div class="repere"><span class="repere-date">1978</span><span class="repere-text">Série américaine <strong>Holocauste</strong> — succès mondial, œuvre marquant plusieurs générations</span></div>
+            <div class="repere"><span class="repere-date">1985</span><span class="repere-text"><strong>Shoah</strong> (Claude Lanzmann, 9h30) — s'intéresse aux témoins, victimes comme bourreaux</span></div>
+            <div class="repere"><span class="repere-date">1993</span><span class="repere-text"><strong>La liste de Schindler</strong> (Steven Spielberg) — génocide grand public</span></div>
+            <div class="repere"><span class="repere-date">1997</span><span class="repere-text"><strong>La vie est belle</strong> (Roberto Begnini) — traite de l'extermination sans la montrer</span></div>
+            <div class="repere"><span class="repere-date">2010</span><span class="repere-text"><strong>La Rafle</strong> (Rose Bosch) — retrace la rafle du Vél d'Hiv en juillet 1942</span></div>
+            <div class="repere"><span class="repere-date">2015</span><span class="repere-text"><strong>Le fils de Saul</strong> (Lazlo Nemes, Hongrois) — Cannes, adoubé par Lanzmann mais polémique</span></div>
+          </div>
+          <div class="synthese-block">
+            <strong>Enjeu :</strong> La relation entre le cinéma et le génocide demeure complexe. Le Mémorial de la Shoah met l'accent sur les films documentaires — la disparition progressive des témoins rend essentiel de recueillir leurs mots. La littérature et le cinéma permettent de <strong>transmettre la mémoire</strong> au-delà des générations de témoins directs.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEXTE : L'ÉPURATION + VICHY (notes de cours) -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t3">Contexte</span>
+      <span class="axe-name">Éléments connexes — Régime de Vichy &amp; L'Épuration (1944-1945)</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">Vichy</span>
+          <span class="jalon-title">Le Régime de Vichy [1940-1944] et la séquence républicaine française</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">18 juin 1940</span><span class="repere-text">Appel du général de Gaulle à la BBC depuis Londres</span></div>
+            <div class="repere"><span class="repere-date key">juillet 1940</span><span class="repere-text"><strong>Philippe Pétain</strong> obtient l'obtention des pleins pouvoirs des députés français → création du régime de Vichy</span></div>
+            <div class="repere"><span class="repere-date">1940-1944</span><span class="repere-text">Régime de Vichy : antisémite, anti-constitutionnel, « Travail, Famille, Patrie » — pas une République (parenthèse). Pétain = image du patriarche. Pierre Laval = chef du gouvernement.</span></div>
+            <div class="repere"><span class="repere-date">1870-1940</span><span class="repere-text">III<sup>e</sup> République (70 ans — le + long à ce jour)</span></div>
+            <div class="repere"><span class="repere-date">1944-1946</span><span class="repere-text">GPRF — Gouvernement Provisoire de la République Française. De Gaulle chef.</span></div>
+            <div class="repere"><span class="repere-date">1946-1958</span><span class="repere-text">IV<sup>e</sup> République</span></div>
+            <div class="repere"><span class="repere-date">1958-…</span><span class="repere-text">V<sup>e</sup> République — en 2028, sera la + longue</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Résistancialisme (H. Rousso)</div>
+              <div class="notion-def">Mythe selon lequel la majorité des Français aurait résisté pendant l'Occupation. Entretenu dans l'après-guerre pour reconstruire l'unité nationale.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Mémoire individuelle</div>
+              <div class="notion-def">Ensemble des souvenirs d'une expérience vécue par un individu — peut être déformée, refoulée, niée.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Mémoire collective nationale</div>
+              <div class="notion-def">Interprétation officielle du passé qui se manifeste notamment dans les commémorations.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">L'Épuration [1944-1945]</div>
+              <div class="notion-def">Rendre la France « pure » en la débarrassant des collaborateurs supposés. Hors-cadre : sauvage et spontanée (juin-août 1944, très illégale). Légale après la mise en place de la Cour de Justice. 9 000 exécutions, humiliations, femmes tondu·e·s.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== THÈME 5 ========== -->
+<div id="view-t5" class="view">
+  <div class="theme-header">
+    <div class="theme-number">5</div>
+    <div>
+      <div class="theme-title">L'environnement entre exploitation et protection : un enjeu planétaire</div>
+      <div class="theme-question">Comment les sociétés peuvent-elles concilier exploitation et protection de leur environnement ?</div>
+    </div>
+  </div>
+
+  <!-- AXE 1 -->
+  <div class="axe open">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t5">Axe 1</span>
+      <span class="axe-name">Exploiter, préserver et protéger</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon open">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">Exploiter et protéger une ressource « naturelle » : la forêt française depuis Colbert</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Repères (la forêt française)</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1669*</span><span class="repere-text"><strong>Ordonnance de Colbert</strong> sur la forêt française — délimite espaces préservés, réglemente l'abattage. But : imiter le recul de la forêt, permettre une gestion durable. « La France périt faute de bois » (Colbert).</span></div>
+            <div class="repere"><span class="repere-date">1824</span><span class="repere-text">Création de l'École nationale des Eaux et Forêts</span></div>
+            <div class="repere"><span class="repere-date key">1827*</span><span class="repere-text"><strong>Code forestier</strong> — priorité à la production de bois, restreint le droit d'usage des paysans → révoltes</span></div>
+            <div class="repere"><span class="repere-date">1830</span><span class="repere-text">Minimum de la surface forestière en France</span></div>
+            <div class="repere"><span class="repere-date">1857</span><span class="repere-text">Plantation de la forêt des Landes de Gascogne</span></div>
+            <div class="repere"><span class="repere-date key">1960*</span><span class="repere-text">Création des <strong>Parcs naturels nationaux</strong> / 1963 : 1<sup>er</sup> = Parc national de la Vanoise (Savoie)</span></div>
+            <div class="repere"><span class="repere-date key">1964*</span><span class="repere-text">Création de l'<strong>ONF</strong>* (Office National des Forêts)</span></div>
+            <div class="repere"><span class="repere-date">2001*</span><span class="repere-text">Loi d'orientation sur la forêt et le développement durable</span></div>
+            <div class="repere"><span class="repere-date">2019</span><span class="repere-text">1,8% de la forêt française classée en aires protégées</span></div>
+          </div>
+
+          <div class="section-label">Définitions clés — Axe 1</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Exploiter</div>
+              <div class="notion-def">Utiliser avantageusement, tirer profit d'une chose en la faisant produire.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Préserver</div>
+              <div class="notion-def">Mettre quelque chose à l'abri d'une altération ou d'une destruction — il suffit de ne pas toucher.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Protéger</div>
+              <div class="notion-def">Empêcher que quelque chose soit soumis à une agression, à un risque — action coercitive sur l'environnement.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Gestion durable*</div>
+              <div class="notion-def">Planification pour une utilisation responsable d'espaces ou de ressources pour atteindre des objectifs environnementaux, économiques et sociaux spécifiques.</div>
+            </div>
+          </div>
+          <div class="synthese-block">
+            <strong>Contradiction fondamentale :</strong> Toute exploitation constitue une altération de l'environnement. La différence entre « préserver » et « protéger » est subtile mais importante pour l'épreuve. Les trois dimensions d'analyse : échelle spatiale (locale/nationale/mondiale), échelle temporelle (court/moyen/long terme), profondeur des changements (irréversibles ou non).
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Le rôle des individus et des sociétés dans l'évolution des milieux : révolution néolithique et révolution industrielle</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Repères néolithiques</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">v. -10 000*</span><span class="repere-text">Premières traces de sédentarisation et d'agriculture au Proche-Orient — fin du Paléolithique, début du Néolithique</span></div>
+            <div class="repere"><span class="repere-date">v. -8 000</span><span class="repere-text">Début de la domestication des animaux</span></div>
+            <div class="repere"><span class="repere-date">v. -6 000</span><span class="repere-text">Début de la sédentarisation en Europe (France)</span></div>
+            <div class="repere"><span class="repere-date">v. -3 000</span><span class="repere-text">Apparition de l'écriture en Mésopotamie — fin du Néolithique, début de l'Antiquité</span></div>
+          </div>
+          <div class="section-label">Repères révolution industrielle</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1769*</span><span class="repere-text">Invention de la <strong>machine à vapeur</strong> par le Britannique James Watt</span></div>
+            <div class="repere"><span class="repere-date">1817</span><span class="repere-text">1<sup>re</sup> locomotive à vapeur (Stephenson, britannique)</span></div>
+            <div class="repere"><span class="repere-date">1828</span><span class="repere-text">1<sup>re</sup> moissonneuse à vapeur McCormick aux EU</span></div>
+            <div class="repere"><span class="repere-date key">1856</span><span class="repere-text">Procédé de fabrication de l'acier / sidérurgie (Bessemer, britannique)</span></div>
+            <div class="repere"><span class="repere-date key">1859*</span><span class="repere-text">Premier puits de pétrole aux EU (Pennsylvanie, Edwin Drake)</span></div>
+            <div class="repere"><span class="repere-date">1886</span><span class="repere-text">Moteur à explosion (Daimler, allemand)</span></div>
+            <div class="repere"><span class="repere-date">1903</span><span class="repere-text">Début du fordisme</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Anthropocène*</div>
+              <div class="notion-def">Période géologique actuelle caractérisée par l'impact déterminant des activités humaines sur l'évolution de l'écosystème planétaire. Débat sur la date de début.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Énergies fossiles*</div>
+              <div class="notion-def">Énergies non renouvelables produites à partir du charbon, du gaz, du pétrole ou de l'uranium — contenues dans le sous-sol.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">GES* (gaz à effet de serre)</div>
+              <div class="notion-def">Gaz CO₂, méthane ou ozone piégé dans l'atmosphère contribuant au changement climatique. De 1750 à 1950, la Grande-Bretagne et les EU représentent 55% du total des émissions mondiales cumulées.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Décroissance*</div>
+              <div class="notion-def">Concept politique, économique et social qui remet en cause l'idée selon laquelle l'augmentation des richesses conduit à l'augmentation du bien-être social.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AXE 2 -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t5">Axe 2</span>
+      <span class="axe-name">Le changement climatique : approches historique et géopolitique</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">Les fluctuations climatiques et leurs effets : l'évolution du climat en Europe du Moyen Âge au XIXe siècle</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">950-1300*</span><span class="repere-text"><strong>P.O.M.*</strong> = Petit Optimum Médiéval = période de réchauffement climatique</span></div>
+            <div class="repere"><span class="repere-date key">1300-1850*</span><span class="repere-text"><strong>P.A.G.*</strong> = Petit Âge Glaciaire = période de refroidissement. D'après l'historien <strong>Emmanuel Le Roy Ladurie</strong> (1929-2023), précurseur de l'analyse historique des climats avec <em>Histoire du climat depuis l'an mil</em> (1967).</span></div>
+            <div class="repere"><span class="repere-date">XVIIe siècle</span><span class="repere-text">Début de la météorologie</span></div>
+            <div class="repere"><span class="repere-date key">1709*</span><span class="repere-text"><strong>Grande famine hivernale en France</strong> — 600 000 morts sur 22 millions d'habitants</span></div>
+            <div class="repere"><span class="repere-date">XVIIIe siècle</span><span class="repere-text">Premières mesures météorologiques se développent (invention du baromètre et du thermomètre au XVIIe)</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Climatologie*</div>
+              <div class="notion-def">Science du climat qui étudie les caractéristiques atmosphériques et météorologiques propres à une région sur de longues périodes (au moins 30 ans).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Météorologie*</div>
+              <div class="notion-def">Science qui donne des informations sur les conditions atmosphériques sur un temps court, pour établir des prévisions à quelques jours.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Le climat, enjeu des relations internationales : les accords internationaux (COP, Sommets de la Terre…)</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1972*</span><span class="repere-text"><strong>1<sup>er</sup> Sommet de la Terre à Stockholm</strong> — établissement de la <strong>CCNUCC*</strong> (Convention Cadre des Nations Unies sur le Changement Climatique)</span></div>
+            <div class="repere"><span class="repere-date key">1988*</span><span class="repere-text">Création du <strong>GIEC*</strong> (Groupe International d'Experts sur le Climat) par l'ONU — bureau pour étudier la responsabilité de l'homme dans le changement climatique</span></div>
+            <div class="repere"><span class="repere-date key">1997*</span><span class="repere-text"><strong>Protocole de Kyoto</strong> (COP 3) — refus du Sénat américain de ratifier</span></div>
+            <div class="repere"><span class="repere-date">2012</span><span class="repere-text">5<sup>e</sup> sommet de la Terre à Rio (après Nairobi 1982, Rio 1992, Johannesburg 2002)</span></div>
+            <div class="repere"><span class="repere-date key">2015*</span><span class="repere-text"><strong>Accords de Paris</strong> à l'issue de la COP* 21 — la <strong>COP</strong> (Conférence des Parties, organe décisionnel de la CCNUCC) se réunit chaque année depuis 1995</span></div>
+            <div class="repere"><span class="repere-date key">2022*</span><span class="repere-text">6<sup>e</sup> Sommet de la Terre — retour à Stockholm, 50 ans après 1972</span></div>
+            <div class="repere"><span class="repere-date key">2025*</span><span class="repere-text"><strong>COP 30 à Bélem au BRÉSIL</strong></span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">GIEC*</div>
+              <div class="notion-def">Groupe International d'Experts sur le Climat — bureau créé par l'ONU pour étudier la responsabilité de l'homme dans le changement climatique. Travaux font reculer le climatoscepticisme.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Climatoscepticisme*</div>
+              <div class="notion-def">Attitude de rejet des théories scientifiques sur le changement climatique — alimenté par les lobbies pétroliers, les Églises évangélistes. Aux EU depuis les années 1980.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Multilatéralisme*</div>
+              <div class="notion-def">Mode de relations interétatiques visant à établir des règles communes. A permis le protocole de Kyoto, mais l'unilatéralisme actuel constitue un frein.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Dette climatique*</div>
+              <div class="notion-def">Concept : les pays anciennement industrialisés seraient responsables du dérèglement climatique actuel et auraient une dette envers les pays en développement.</div>
+            </div>
+          </div>
+          <div class="synthese-block">
+            <strong>Bilan mitigé :</strong> L'accord de Paris a été ratifié par 184 pays mais un seul respecte ses engagements : la Gambie. Comme l'explique François Gemenne, « il y a eu une déclaration d'intention très louable à la COP 21. Mais dès qu'il s'agit de mettre en œuvre les engagements qui ont été pris, les grands pays ne sont plus au rendez-vous. » La gouvernance climatique reste à construire : absence de sanctions en cas de non-respect des accords.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTC USA -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag otc">OTC</span>
+      <span class="axe-name">Les États-Unis et la question environnementale : tensions et contrastes</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">L'environnement aux USA : entre protection, exploitation et transformation depuis le XIXe s.</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1859*</span><span class="repere-text">Premier forage pétrolier au monde (Pennsylvanie)</span></div>
+            <div class="repere"><span class="repere-date key">1872*</span><span class="repere-text">Premier parc naturel au monde : <strong>Yellowstone</strong></span></div>
+            <div class="repere"><span class="repere-date">1880</span><span class="repere-text"><strong>John Muir</strong> (1838-1914) obtient le classement du Yosémite en parc national, fonde le <strong>Sierra Club</strong> — une des plus anciennes ONG de protection environnementale. Défend la <strong>wilderness</strong>.</span></div>
+            <div class="repere"><span class="repere-date">1901-1909</span><span class="repere-text"><strong>Theodore Roosevelt</strong> — 150 forêts protégées, 5 parcs nationaux, 51 réserves ornithologiques. Renforce le rôle de l'État fédéral.</span></div>
+            <div class="repere"><span class="repere-date">1911</span><span class="repere-text">Première plateforme pétrolière offshore (golfe du Mexique)</span></div>
+            <div class="repere"><span class="repere-date key">1970*</span><span class="repere-text">Naissance de l'<strong>EPA*</strong> (Agence de Protection de l'Environnement) sous Nixon. Adoption du <em>Clean Air Act</em>.</span></div>
+            <div class="repere"><span class="repere-date">1989</span><span class="repere-text">Premières théories climatosceptiques</span></div>
+            <div class="repere"><span class="repere-date key">1997*</span><span class="repere-text">Refus du Sénat américain de ratifier le protocole de Kyoto</span></div>
+            <div class="repere"><span class="repere-date">2010</span><span class="repere-text">Marée noire Deepwater Horizon (golfe du Mexique, Louisiane) — plus vaste au monde</span></div>
+            <div class="repere"><span class="repere-date">2015</span><span class="repere-text">Signature de l'accord de Paris par B. Obama</span></div>
+            <div class="repere"><span class="repere-date key">2017*</span><span class="repere-text">Retrait de l'accord de Paris par D. Trump</span></div>
+            <div class="repere"><span class="repere-date key">2021*</span><span class="repere-text">Retour dans l'accord de Paris par J. Biden</span></div>
+            <div class="repere"><span class="repere-date key">2025</span><span class="repere-text">Retrait des accords de Paris à nouveau par Trump (dès janvier 2025)</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">État fédéral</div>
+              <div class="notion-def">État composé d'unités autonomes dotées de pouvoirs propres (justice, éducation, environnement) — ici les 50 États fédérés. Washington DC a autorité dans quelques domaines (diplomatie, armée).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Wilderness*</div>
+              <div class="notion-def">Terme anglais désignant le caractère sauvage de la nature — concept central dans la politique environnementale américaine depuis le XIXe s.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">EPA*</div>
+              <div class="notion-def">Agence de Protection de l'Environnement — créée en 1970. Budget en baisse sous Trump. L'État fédéral reste acteur majeur de la gestion environnementale nationale.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Les USA et l'environnement à l'échelle internationale (État, firmes transnationales, ONG…)</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="enjeux-list">
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Première économie mondiale</strong> : EU consomment 20% de l'énergie, émettent 15% des GES. Contribution à la lutte contre le réchauffement climatique essentielle.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Contradictions internes</strong> : oscillation entre engagement (Obama, Biden) et retrait (Trump 2017, 2025). Lobbies pétroliers + Églises évangélistes encouragent le climatoscepticisme.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Réseau C40</strong> : depuis 2019, 94 métropoles à travers la planète dont 14 états-uniennes. Politiques climatiques locales en opposition à la politique fédérale.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>ONG</strong> : Sierra Club, Conservation International, Surfrider Foundation, Institut Worldwatch — très actives aux EU.</span></div>
+            <div class="enjeu"><span class="enjeu-icon">→</span><span class="enjeu-text"><strong>Silicon Valley</strong> : Google, Tesla et entreprises californiennes investissent dans les technologies innovantes de l'environnement.</span></div>
+          </div>
+          <div class="synthese-block">
+            <strong>Tension centrale de l'OTC :</strong> Les EU sont à la fois pionniers de la protection de la nature (1er parc, 1er pétrole, EPA) et grands pollueurs. La contradiction entre « american way of life » et engagement environnemental structure toute la politique américaine. Les États fédérés (Californie) s'opposent souvent à l'État fédéral.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== THÈME 2 ========== -->
+<div id="view-t2" class="view">
+  <div class="theme-header">
+    <div class="theme-number">2</div>
+    <div>
+      <div class="theme-title">Faire la guerre, faire la paix : formes de conflits et modes de résolution</div>
+      <div class="theme-question">Comment se transforme la manière de penser et de faire la guerre depuis la guerre de Sept ans (1756-1763) ?</div>
+    </div>
+  </div>
+
+  <!-- AXE 1 -->
+  <div class="axe open">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t2">Axe 1</span>
+      <span class="axe-name">La dimension géopolitique de la guerre</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon open">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">De la « guerre réelle » à la « guerre absolue » : de la guerre de 7 ans aux guerres révolutionnaires et napoléoniennes</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Modèle clausewitzien</div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Guerre réelle (Clausewitz)</div>
+              <div class="notion-def">Guerre aristocratique, limitée, menée à des fins politiques. Conflits interétatiques et symétriques. Armées royales professionnelles et mercenaires. Exemple : guerre de Sept ans (1756-1763).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Guerre absolue (Clausewitz)</div>
+              <div class="notion-def">La guerre change de nature lors des guerres révolutionnaires — il s'agit désormais de détruire les forces de l'adversaire par une violence illimitée. Rendue possible par la conscription et le sentiment national.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Conscription*</div>
+              <div class="notion-def">Recrutement militaire obligatoire — transforme les guerres en guerres de masse. L'armée devient lieu de transformation de la société et de nationalisation des masses (G. Mosse).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Clausewitz — « De la guerre »</div>
+              <div class="notion-def">« La guerre n'est rien d'autre que la continuation de la politique par d'autres moyens. » Elle est un moyen, non une fin. Les autorités militaires doivent se plier aux objectifs politiques.</div>
+            </div>
+          </div>
+          <div class="section-label">Repères</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1756-1763</span><span class="repere-text"><strong>Guerre de Sept ans</strong> — guerre réelle, limitée, interétatique et symétrique. 75 000 combattants à Rossbach (1757)</span></div>
+            <div class="repere"><span class="repere-date key">1792-1815</span><span class="repere-text"><strong>Guerres révolutionnaires puis napoléoniennes</strong> — guerre devient absolue. 1,2 million de soldats à Verdun en 1916. 3 millions d'Européens meurent entre 1805 et 1815.</span></div>
+            <div class="repere"><span class="repere-date key">1914-1918</span><span class="repere-text"><strong>Première Guerre mondiale</strong> — 10 millions de morts, 70 millions de soldats mobilisés. Guerres totales* mobilisent toutes les ressources.</span></div>
+            <div class="repere"><span class="repere-date key">1939-1945</span><span class="repere-text"><strong>Seconde Guerre mondiale</strong> — guerre d'anéantissement, 60 millions de morts dont 60% de civils. Blitz de Londres (1940-41), Hiroshima/Nagasaki (6 et 8 août 1945).</span></div>
+          </div>
+          <div class="synthese-block">
+            <strong>Synthèse Axe 1 T2 :</strong> La guerre passe de conflits interétatiques limités (XVIIIe) à des guerres totales d'anéantissement (XXe). Clausewitz théorise ce passage — son traité <em>De la guerre</em> influence les stratèges des guerres mondiales et des révolutions. Au XXIe s., les guerres asymétriques et le terrorisme remettent en cause ce modèle.
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">La guerre irrégulière d'Al-Qaïda (1987-2011) et de Daech (2006-2019)</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="section-label">Al-Qaïda [1987-2011]</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1987</span><span class="repere-text">Fondation d'Al-Qaïda par Oussama Ben Laden (1957-2011), Saoudien déchu de sa nationalité en 1994. Fondée en Afghanistan (où il combat dans les années 1980 contre les Soviétiques).</span></div>
+            <div class="repere"><span class="repere-date">1994</span><span class="repere-text">Ben Laden déchu de sa nationalité. Base déplacée entre l'Afghanistan et/ou le Pakistan.</span></div>
+            <div class="repere"><span class="repere-date key">11 sept. 2001</span><span class="repere-text">Attentats aux EU → obtient un écho international après le quadruple attentat</span></div>
+            <div class="repere"><span class="repere-date key">2 mai 2011</span><span class="repere-text">Ben Laden tué lors d'un raid américain au Pakistan</span></div>
+          </div>
+          <div class="section-label">Daech / État islamique [2006-2019]</div>
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">2006</span><span class="repere-text">Naissance de Daech en Irak — scission d'Al-Qaïda, profite de la situation créée par l'intervention américaine de 2003 et la chute de Saddam Hussein (1979-2003)</span></div>
+            <div class="repere"><span class="repere-date key">2014</span><span class="repere-text">Essor fulgurant — proclamation d'un <strong>califat</strong>. Dirigé par Al-Baghdadi.</span></div>
+            <div class="repere"><span class="repere-date key">13 nov. 2015</span><span class="repere-text">Attentats de Paris (pires jamais commis en France)</span></div>
+            <div class="repere"><span class="repere-date key">14 juil. 2016</span><span class="repere-text">Attentat de Nice</span></div>
+            <div class="repere"><span class="repere-date key">2019</span><span class="repere-text">Perte de territoire — Al-Baghdadi tué lors d'une opération américaine</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Guerre irrégulière* (ou asymétrique)</div>
+              <div class="notion-def">Réseau dominant des adversaires conventionnels aux ressources matérielles limitées par des combattants qui utilisent des ressources limitées.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Djihad</div>
+              <div class="notion-def">« Guerre sainte » menée contre les « infidèles » pour imposer un prétendu retour au véritable islam.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Islamisme*</div>
+              <div class="notion-def">Mouvement radical prônant l'application de la loi islamique et le refus de la « modernité » occidentale, voire son combat.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Califat*</div>
+              <div class="notion-def">Régime politique obéissant à un calife « successeur » de Mahomet.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Cyberguerre*</div>
+              <div class="notion-def">Attaque informatique des infrastructures stratégiques d'un État ou d'une entreprise. Les guerres asymétriques s'en nourrissent (inégal accès à la technologie).</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Guerre hybride*</div>
+              <div class="notion-def">Combine des éléments de guerres asymétriques, conventionnelles et guérillas.</div>
+            </div>
+          </div>
+          <div class="synthese-block">
+            <strong>Clausewitz remis en cause ?</strong> Le modèle clausewitzien est <em>partiellement</em> remis en question. Al-Qaïda et Daech opèrent en réseau, sans frontières ni front. Les terroristes ignorent les frontières étatiques. Mais la radicalisation de la position de chaque belligérant recourt aux concepts clausewitziens (guerre absolue, montée aux extrêmes). Pour ne pas conclure : la guerre est « un caméléon » qui change de nature selon les circonstances (Clausewitz).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AXE 2 -->
+  <div class="axe">
+    <div class="axe-header" onclick="toggleAxe(this)">
+      <span class="axe-tag t2">Axe 2</span>
+      <span class="axe-name">Le défi de la construction de la paix</span>
+      <span class="axe-toggle">▼</span>
+    </div>
+    <div class="axe-body">
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J1</span>
+          <span class="jalon-title">Élaborer les traités de paix en Westphalie (1648) et établir un nouvel ordre européen</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1648</span><span class="repere-text"><strong>Traités de Westphalie</strong> — mettent fin à la Guerre de Trente Ans. Posent les bases du droit international moderne et du principe de souveraineté des États.</span></div>
+            <div class="repere"><span class="repere-date key">1919</span><span class="repere-text"><strong>Traité de Versailles</strong> — impose l'article 231 (responsabilité de l'Allemagne). Crée la SDN (Société des Nations) pour la sécurité collective.</span></div>
+            <div class="repere"><span class="repere-date">1919</span><span class="repere-text">Les « 14 points » du président américain <strong>Woodrow Wilson</strong> — idée d'un système garant d'une sécurité collective</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">Sécurité collective*</div>
+              <div class="notion-def">Principe considérant que la sécurité d'un État est l'affaire de tous les autres États. La défense de la paix relève donc d'une décision collective.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">SDN — faiblesses structurelles</div>
+              <div class="notion-def">EU n'adhèrent pas (isolationnisme). Allemagne (1933) et Italie (1937) quittent. Incapable de faire respecter le droit international (invasion Éthiopie 1936, annexions de l'Autriche et des Sudètes).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jalon">
+        <div class="jalon-header" onclick="toggleJalon(this)">
+          <span class="jalon-num">J2</span>
+          <span class="jalon-title">Résoudre les conflits par la sécurité collective : Kofi Annan et l'ONU (1997-2006)</span>
+          <span class="jalon-toggle">▼</span>
+        </div>
+        <div class="jalon-content">
+          <div class="reperes-list">
+            <div class="repere"><span class="repere-date key">1945</span><span class="repere-text">Création de l'<strong>ONU</strong> avec la signature de la Charte des Nations Unies à San Francisco. Succède à la SDN.</span></div>
+            <div class="repere"><span class="repere-date">1948</span><span class="repere-text"><strong>Casques bleus</strong> — force armée d'interposition depuis 1948</span></div>
+            <div class="repere"><span class="repere-date">1950-1953</span><span class="repere-text">Guerre de Corée — 1,5 million de morts</span></div>
+            <div class="repere"><span class="repere-date">1990-1991</span><span class="repere-text">Guerre du Golfe</span></div>
+            <div class="repere"><span class="repere-date">1998</span><span class="repere-text">Création de la <strong>CPI</strong> (Cour Pénale Internationale)</span></div>
+            <div class="repere"><span class="repere-date key">1997-2006</span><span class="repere-text"><strong>Kofi Annan</strong> (1938-2018, Ghanaïen) — secrétaire général de l'ONU. 1er issu des rangs du personnel de l'ONU. Prix Nobel de la Paix en 2001. Réélu en 2001. « L'ONU n'a pas créé le paradis, mais elle a évité l'enfer » (Dag Hammarskjöld, sec. gen. 1953-1961).</span></div>
+          </div>
+          <div class="notions-grid">
+            <div class="notion-card">
+              <div class="notion-term">ONU — 3 grands organes</div>
+              <div class="notion-def"><strong>Assemblée générale</strong> (tous les pays), <strong>Conseil de sécurité</strong> (15 membres dont 5 permanents avec droit de veto : USA, GB, URSS/Russie, Chine, France), <strong>Secrétaire général</strong> (nommé par l'Assemblée, 5 ans, 2 rôles : diplomate + chef d'administration). Actuellement : Antonio Guterres.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Casques bleus</div>
+              <div class="notion-def">Force armée d'interposition depuis 1948 — soldats des pays membres de l'ONU, force internationale mandatée par le Conseil de sécurité.</div>
+            </div>
+            <div class="notion-card">
+              <div class="notion-term">Guerre froide et ONU</div>
+              <div class="notion-def">L'ONU est paralysée entre les deux superpuissances (USA/URSS). Dans la construction de la paix, l'ONU est très souvent débordée par le jeu des puissances.</div>
+            </div>
+          </div>
+          <div class="synthese-block">
+            <strong>Bilan de l'ONU :</strong> L'ONU succède à une SDN inefficace. Son objectif : maintenir la paix internationale. Pendant la Guerre froide, paralysie par le veto. Depuis 1990, intervention dans de nombreux conflits mais difficultés structurelles (veto, États faillis, terrorisme déterritorialisé). La sécurité collective reste un idéal difficile à atteindre.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHRONOLOGIE ========== -->
+<div id="view-chron" class="view">
+  <h2 style="font-family:'Libre Baskerville',serif; font-weight:400; font-size:1.4rem; margin-bottom:1rem;">Chronologie générale</h2>
+  <div class="chron-filter">
+    <button class="chron-tag-btn active" onclick="filterChron('all', this)">Tout</button>
+    <button class="chron-tag-btn" onclick="filterChron('t2', this)">Thème 2 — Guerre &amp; Paix</button>
+    <button class="chron-tag-btn" onclick="filterChron('t3', this)">Thème 3 — Histoire &amp; Mémoires</button>
+    <button class="chron-tag-btn" onclick="filterChron('t5', this)">Thème 5 — Environnement</button>
+  </div>
+  <div class="timeline" id="timeline-container"></div>
+</div>
+
+<!-- ========== FLASHCARDS ========== -->
+<div id="view-flash" class="view">
+  <div class="flash-controls">
+    <select class="flash-select" id="flash-filter" onchange="resetFlash()">
+      <option value="all">Tous les thèmes</option>
+      <option value="t2">Thème 2 — Guerre &amp; Paix</option>
+      <option value="t3">Thème 3 — Histoire &amp; Mémoires</option>
+      <option value="t5">Thème 5 — Environnement</option>
+      <option value="notions">Notions uniquement</option>
+      <option value="dates">Repères chronologiques</option>
+    </select>
+    <button class="flash-btn" onclick="shuffleCards()">Mélanger</button>
+    <button class="flash-btn primary" onclick="resetFlash()">Recommencer</button>
+    <div class="flash-progress" id="flash-progress">0 / 0</div>
+  </div>
+
+  <div class="flash-container">
+    <div class="flashcard" id="flashcard" onclick="revealCard()">
+      <div class="card-side-label" id="card-side">Question</div>
+      <div class="card-theme-tag" id="card-theme-tag"></div>
+      <div class="card-question" id="card-q">Chargement...</div>
+      <div class="card-answer" id="card-a"></div>
+      <div class="card-hint">Cliquez pour révéler la réponse</div>
+    </div>
+  </div>
+
+  <div class="flash-nav">
+    <button class="flash-btn" onclick="prevCard()">← Précédente</button>
+    <button class="flash-btn" id="btn-ko" onclick="markCard(false)" style="display:none; background:var(--red-light); border-color:#d4a0a0; color:#8b2020;">✗ À revoir</button>
+    <button class="flash-btn" id="btn-ok" onclick="markCard(true)" style="display:none; background:var(--green-light); border-color:#a0c4a0; color:#1a5a1a;">✓ Connu</button>
+    <button class="flash-btn" onclick="nextCard()">Suivante →</button>
+  </div>
+  <div class="flash-score">
+    <span>Connus : <span class="score-ok" id="score-ok">0</span></span>
+    <span>À revoir : <span class="score-ko" id="score-ko">0</span></span>
+    <span>Restants : <span id="score-left">0</span></span>
+  </div>
+</div>
+
+</main>
+
+<script>
+const CARDS = [
+  {q:"Quelle est la thèse de Fritz Fischer (1961) ?", a:"1er historien allemand à défier la version officielle — démontre la responsabilité CENTRALE de l'Allemagne dans l'engrenage de 1914. Remet en cause toute l'historiographie allemande.", theme:"t3", type:"notions"},
+  {q:"Quelle est la thèse de Christopher Clark (Les Somnambules, 2012) ?", a:"Responsabilité PARTAGÉE de toutes les puissances européennes. À l'occasion du centenaire de la Grande Guerre, relance le débat avec Münkler.", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que l'historiographie ?", a:"Ensemble des travaux historiques produits sur un sujet — la façon de construire et d'écrire l'histoire. Les historiens cherchent les infos, sources disponibles, confrontent les contradictions.", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que la 'brutalisation' (G. Mosse, 1990) ?", a:"Banalisation de la violence après la Première Guerre mondiale, qui tend à s'imprégner des sociétés — notamment allemande, italienne et hongroise. Se répand dans les États vaincus ou déçus des traités de paix.", theme:"t3", type:"notions"},
+  {q:"Quelle est l'historiographie dominante sur les causes de la PGM aujourd'hui ?", a:"Multicausalité : décisions politiques des élites + engrenage diplomatique + nationalismes + cultures de guerre. La Grande Guerre = produit d'une Europe en crise où les acteurs ont agi sans mesurer la gravité de leurs choix.", theme:"t3", type:"notions"},
+  {q:"Quand a eu lieu la « Toussaint rouge » ?", a:"1er novembre 1954 — attentats indépendantistes du FLN, début officiel de la guerre d'Algérie.", theme:"t3", type:"dates"},
+  {q:"Que s'est-il passé le 17 octobre 1961 à Paris ?", a:"Répression d'une manifestation d'Algériens à Paris — plus de 50 morts, des centaines de blessés. Maurice Papon, préfet de police (nommé par de Gaulle).", theme:"t3", type:"dates"},
+  {q:"Que sont les accords d'Évian (19 mars 1962) ?", a:"Signés entre la France et le FLN — prévoient un cessez-le-feu immédiat + référendum sur l'autodétermination le 1er juillet. Mènent à l'indépendance de l'Algérie le 5 juillet 1962.", theme:"t3", type:"dates"},
+  {q:"Qui est Raphaëlle Branche ?", a:"Historienne française, publie en 2001 La torture et l'Armée pendant la guerre d'Algérie 1954-1962. Montre que la torture par l'armée française s'inscrivait dans une politique destinée à conserver l'Algérie française.", theme:"t3", type:"notions"},
+  {q:"Bilan humain du génocide rwandais (1994) ?", a:"800 000 victimes dont 77% de la population tutsi. 175 000 (ou +) génocidaires actifs — soit 7-8% de la population hutue.", theme:"t3", type:"dates"},
+  {q:"Quand et où ont eu lieu les massacres de Sétif, Guelma et Kherrata ?", a:"8 mai 1945 — dans l'est de l'Algérie. Massacres de la population algérienne par l'armée française.", theme:"t3", type:"dates"},
+  {q:"Que sont les tribunaux Gacaca ?", a:"Tribunaux locaux rwandais (2002-2012) — justice organisée et rendue par des citoyens. Victimes peuvent s'exprimer directement. Ont permis de juger près de 900 000 personnes. Juges non-professionnels → risque de pressions.", theme:"t3", type:"notions"},
+  {q:"Quand et où a eu lieu le procès d'Eichmann ?", a:"1961 à Jérusalem — capturé par le Mossad en Argentine. Pour Hannah Arendt : la 'banalité du mal'. Pour Annette Wieviorka : fin du 'grand silence'.", theme:"t3", type:"dates"},
+  {q:"Quand Jacques Chirac reconnaît-il la responsabilité de l'État français dans la rafle du Vél d'Hiv ?", a:"1995 — travail de reconnaissance se poursuit : en 2011, l'UE reconnaît le génocide des Tsiganes. En France, le plus grand camp des Tsiganes était à Montreuil-Bellay (Maine-et-Loire).", theme:"t3", type:"dates"},
+  {q:"Qu'est-ce que le mythe résistancialiste ?", a:"Terme forgé par Henry Rousso — mythe selon lequel la majorité des Français aurait résisté pendant l'Occupation. Entretenu par la IVe République pour faire oublier la collaboration de Vichy.", theme:"t3", type:"notions"},
+  {q:"Quelles sont les 3 Républiques françaises liées au cours (années) ?", a:"IIIe République [1870-1940], IVe République [1946-1958], Ve République [1958-...] — en 2028 sera la plus longue.", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que le Régime de Vichy ?", a:"[1940-1944] — antisémite, anti-constitutionnel, 'Travail, Famille, Patrie'. Pas une République (parenthèse). Pétain = image du patriarche. Pierre Laval = chef du gouvernement. GPRF lui succède [1944-46].", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que Yad Vashem ?", a:"Centre mondial de documentation, recherche, éducation et commémoration de la Shoah — ouvert à Jérusalem en 1953.", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que Primo Levi a écrit et quand ?", a:"Si c'est un homme — publié en 1947 avec un tirage confidentiel. Traduit en français seulement en 1987. Déporté et rescapé juif italien.", theme:"t3", type:"notions"},
+  {q:"Quelle est la différence entre Préserver et Protéger ?", a:"Préserver : mettre à l'abri d'une altération — suffit de ne pas toucher. Protéger : empêcher qu'une chose soit soumise à un risque — implique une action coercitive sur l'environnement. La protection implique davantage d'action.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que l'ordonnance de Colbert de 1669 ?", a:"Ordonnance sur la forêt française — délimite des espaces préservés, réglemente l'abattage des arbres. But : imiter le recul de la forêt et permettre une gestion durable. 'La France périt faute de bois' (Colbert).", theme:"t5", type:"dates"},
+  {q:"Qu'est-ce que le P.O.M. et le P.A.G. ?", a:"P.O.M. = Petit Optimum Médiéval [950-1300] = période de réchauffement. P.A.G. = Petit Âge Glaciaire [1300-1850] = période de refroidissement. Termes de l'historien Emmanuel Le Roy Ladurie.", theme:"t5", type:"notions"},
+  {q:"Qui est Emmanuel Le Roy Ladurie et quel est son apport ?", a:"Historien français (1929-2023) — précurseur de l'analyse historique des climats avec Histoire du climat depuis l'an mil (1967). Identifie le PAG et le POM.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que l'Anthropocène ?", a:"Période géologique actuelle caractérisée par l'impact déterminant des activités humaines sur l'évolution de l'écosystème planétaire. Terme débattu dans la communauté scientifique, notamment sur la date de début.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que la CCNUCC ?", a:"Convention Cadre des Nations Unies sur le Changement Climatique — établie lors du 1er Sommet de la Terre à Stockholm en 1972. La COP est son organe décisionnel.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que la COP ? Quelle est la première et la dernière ?", a:"Conférence des Parties, organe décisionnel de la CCNUCC — se réunit chaque année depuis 1995. 1ère : Berlin 1995, dernière en date : COP 30 Bélem (Brésil) en 2025.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que le GIEC ?", a:"Groupe International d'Experts sur le Climat — créé par l'ONU en 1988. Bureau pour étudier la responsabilité de l'homme dans le changement climatique. Ses travaux font reculer le climatoscepticisme.", theme:"t5", type:"notions"},
+  {q:"Quand et qui a signé / retiré l'accord de Paris ?", a:"Signé par Obama en 2015. Retiré par Trump en 2017. Retour sous Biden en 2021. Retiré à nouveau par Trump en janvier 2025.", theme:"t5", type:"dates"},
+  {q:"Quelle est la grande famine hivernale française de 1709 ?", a:"1709* — grande famine hivernale en France (Petit Âge Glaciaire) : 600 000 morts sur 22 millions d'habitants. Exemple de l'impact du PAG sur les sociétés européennes.", theme:"t5", type:"dates"},
+  {q:"Qu'est-ce que l'EPA ?", a:"Agence de Protection de l'Environnement des États-Unis — créée en 1970 sous Nixon. Budget en baisse sous Trump. L'État fédéral reste acteur majeur de la gestion environnementale nationale.", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que la Wilderness ?", a:"Terme anglais désignant le caractère sauvage de la nature — concept central de la protection environnementale américaine depuis le XIXe siècle. L'idée de Yellowstone (1872) repose dessus.", theme:"t5", type:"notions"},
+  {q:"Quel est le rôle de Theodore Roosevelt dans la politique environnementale américaine ?", a:"[1901-1909] — 150 forêts protégées, 5 parcs nationaux, 51 réserves ornithologiques. Renforce le rôle de l'État fédéral dans la protection de l'environnement.", theme:"t5", type:"notions"},
+  {q:"Quand a été créé le premier parc naturel au monde ?", a:"1872 — Yellowstone (États-Unis). Et le 1er parc national en France : Vanoise (Savoie) en 1963, après la création des parcs naturels nationaux en 1960.", theme:"t5", type:"dates"},
+  {q:"Quelle est la thèse de Clausewitz sur la guerre ?", a:"'La guerre n'est rien d'autre que la continuation de la politique par d'autres moyens.' Elle est un moyen, non une fin. Les autorités militaires doivent se plier aux objectifs politiques et non l'inverse.", theme:"t2", type:"notions"},
+  {q:"Quelle est la différence entre guerre réelle et guerre absolue (Clausewitz) ?", a:"Guerre réelle = guerre limitée à des fins politiques (ex: guerre de 7 ans). Guerre absolue = violence illimitée pour détruire l'adversaire (ex: guerres napoléoniennes, mondiales). La conscription rend possible la guerre absolue.", theme:"t2", type:"notions"},
+  {q:"Qu'est-ce que la conscription ?", a:"Recrutement militaire obligatoire — transforme les guerres en guerres de masse. Rendu possible par la Révolution française et le sentiment national. L'armée devient lieu de nationalisation des masses (G. Mosse).", theme:"t2", type:"notions"},
+  {q:"Quand Al-Qaïda a-t-elle été fondée et par qui ?", a:"1987 — fondée par Oussama Ben Laden (Saoudien, 1957-2011) en Afghanistan où il combat contre les Soviétiques dans les années 1980. Ben Laden tué le 2 mai 2011 lors d'un raid américain au Pakistan.", theme:"t2", type:"dates"},
+  {q:"Quand Daech proclame-t-il son califat ?", a:"2014 — essor fulgurant. Dirigé par Al-Baghdadi. Profite de la situation créée par l'intervention américaine de 2003 en Irak. Attentats de Paris (13 nov. 2015) et Nice (14 juil. 2016). Perd son territoire en 2019.", theme:"t2", type:"dates"},
+  {q:"Qu'est-ce que le Djihad ?", a:"'Guerre sainte' menée contre les 'infidèles' pour imposer un prétendu retour au véritable islam — concept utilisé par Al-Qaïda et Daech pour légitimer leurs actions terroristes.", theme:"t2", type:"notions"},
+  {q:"Qu'est-ce que l'islamisme ?", a:"Mouvement radical prônant l'application de la loi islamique (charia) et le refus de la 'modernité' occidentale, voire son combat — idéologie de fondement d'Al-Qaïda et Daech.", theme:"t2", type:"notions"},
+  {q:"Quand a été créée l'ONU et quel est son objectif ?", a:"1945 — signature de la Charte des Nations Unies à San Francisco. Objectif : assurer le maintien de la paix et de la sécurité internationale (Article 1). Succède à la SDN.", theme:"t2", type:"dates"},
+  {q:"Qui sont les 5 membres permanents du Conseil de sécurité de l'ONU ?", a:"USA, Grande-Bretagne, URSS/Russie, Chine, France — les vainqueurs de la 2e Guerre mondiale. Chacun dispose d'un droit de veto.", theme:"t2", type:"notions"},
+  {q:"Qui est Kofi Annan ?", a:"Ghanaïen (1938-2018) — secrétaire général de l'ONU de 1997 à 2006. 1er issu des rangs du personnel de l'ONU. Prix Nobel de la Paix en 2001. Constate la difficulté de l'ONU à prévenir les conflits (ex-Yougoslavie, Rwanda).", theme:"t2", type:"notions"},
+  {q:"Qu'est-ce que la sécurité collective ?", a:"Principe considérant que la sécurité d'un État est l'affaire de tous les autres États. La défense de la paix relève d'une décision collective — principe fondateur de la SDN puis de l'ONU.", theme:"t2", type:"notions"},
+  {q:"Quelles sont les faiblesses structurelles de la SDN ?", a:"EU n'adhèrent pas (isolationnisme). Allemagne (1933) et Italie (1937) quittent. Incapable de faire respecter le droit international : invasion Italienne en Éthiopie (1936), annexions Autriche et Sudètes par le IIIe Reich.", theme:"t2", type:"notions"},
+  {q:"Que sont les Casques bleus ?", a:"Force armée d'interposition créée en 1948 — soldats des pays membres de l'ONU, mandatés par le Conseil de sécurité pour des missions d'interposition dans les conflits.", theme:"t2", type:"notions"},
+  {q:"Qu'est-ce qu'une guerre asymétrique / irrégulière ?", a:"Conflit opposant des armées conventionnelles à un groupe de terroristes peu nombreux disposant de moyens réduits. Rend difficile la lutte pour des acteurs étatiques habitués à l'emporter sur des terrains d'opération définis.", theme:"t2", type:"notions"},
+  {q:"Qu'est-ce que l'embrigadement (notion Axe 2 Thème 3) ?", a:"Processus consistant à faire en sorte qu'une large part de la population se mette à penser d'une certaine façon — manipulation des foules par des discours de haine et la diffusion de fausses informations.", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que la CPI ?", a:"Cour Pénale Internationale — créée en 1998, siège permanent depuis 2002 à La Haye pour juger les crimes de guerre et crimes contre l'humanité. Distincte du TPIY (Yougoslavie) et du TPIR (Rwanda).", theme:"t2", type:"notions"},
+  {q:"Quelle est la ressource stratégique clé du secteur des transports au XXIe siècle ?", a:"Le pétrole s'impose comme ressource stratégique dans l'ensemble des secteurs, notamment le transport. Depuis 2010, 75% des découvertes se font en mer (offshore, à 1500m de profondeur).", theme:"t5", type:"notions"},
+  {q:"Que représentent les États-Unis en termes d'énergie et de GES à l'échelle mondiale ?", a:"EU consomment 20% de l'énergie mondiale et émettent 15% des GES. Si tous les habitants du monde adoptaient le mode de vie américain, il faudrait les ressources de 5 planètes Terre (ONG WWF).", theme:"t5", type:"notions"},
+  {q:"Qu'est-ce que la multiculturalité dans les causes de la 1ère GM (historiographie dominante) ?", a:"Décisions politiques des élites + engrenage diplomatique + nationalismes + cultures de guerre. La Grande Guerre apparaît comme le produit d'une Europe en crise où les acteurs ont agi sans mesurer la gravité de leurs choix.", theme:"t3", type:"notions"},
+  {q:"Quel est le slogan de Vichy ?", a:"'Travail, Famille, Patrie' — en opposition aux valeurs républicaines 'Liberté, Égalité, Fraternité'. Régime antisémite, anti-constitutionnel. Pas une République (parenthèse de la République).", theme:"t3", type:"notions"},
+  {q:"Qu'est-ce que le résistancialisme ? Qui l'a théorisé ?", a:"Henry Rousso — terme désignant le mythe selon lequel la majorité des Français aurait résisté. La mémoire dominante cherche à faire oublier la 'mémoire douloureuse du régime de Vichy', ce 'passé qui ne passe pas'.", theme:"t3", type:"notions"},
+  {q:"Quelle est la date de création du Code forestier français ?", a:"1827* — Code forestier, recueil de textes sur l'exploitation et la protection des forêts. Priorité à la production de bois. Restreint le droit d'usage des paysans → révoltes.", theme:"t5", type:"dates"},
+  {q:"Quel a été le 1er sommet de la Terre et quand ?", a:"1972 à Stockholm — établit la CCNUCC. Suivi par Rio (1992), Johannesburg (2002), Rio (2012), Stockholm (2022). Le 5e sommet à Rio en 2012.", theme:"t5", type:"dates"},
+  {q:"Qu'est-ce que la 'Grande Accélération' (Thème 5) ?", a:"Accélération de l'activité humaine à partir de 1945 (industrialisation, modernisation de l'agriculture) marquée par une forte consommation d'énergie et de matières premières — augmente les pressions sur les milieux.", theme:"t5", type:"notions"},
+  {q:"Qui est John Muir et quel est son rôle ?", a:"Naturaliste américain (1838-1914) — obtient classement du Yosémite en parc national en 1890. Fonde le Sierra Club pour protéger la Sierra Nevada californienne — une des plus anciennes ONG de protection environnementale.", theme:"t5", type:"notions"},
+];
+
+let deck = [];
+let currentIdx = 0;
+let scores = { ok: 0, ko: 0 };
+
+function getFilteredDeck() {
+  const f = document.getElementById('flash-filter').value;
+  if (f === 'all') return [...CARDS];
+  if (f === 'notions') return CARDS.filter(c => c.type === 'notions');
+  if (f === 'dates') return CARDS.filter(c => c.type === 'dates');
+  return CARDS.filter(c => c.theme === f);
+}
+
+function shuffleArr(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function shuffleCards() {
+  deck = shuffleArr(getFilteredDeck());
+  currentIdx = 0;
+  scores = { ok: 0, ko: 0 };
+  renderCard();
+}
+
+function resetFlash() {
+  deck = getFilteredDeck();
+  currentIdx = 0;
+  scores = { ok: 0, ko: 0 };
+  renderCard();
+}
+
+function renderCard() {
+  if (!deck.length) return;
+  const card = deck[currentIdx];
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('revealed');
+  document.getElementById('card-q').textContent = card.q;
+  document.getElementById('card-a').textContent = card.a;
+  document.getElementById('card-side').textContent = 'Question';
+  const themeLabels = { t2: 'Thème 2', t3: 'Thème 3', t5: 'Thème 5' };
+  const themeColors = { t2: 'background:#deeaf5;color:#1a4a7a', t3: 'background:#f0e8dc;color:#7a4a1a', t5: 'background:#deeae0;color:#1a5a2a' };
+  const tag = document.getElementById('card-theme-tag');
+  tag.textContent = themeLabels[card.theme] || '';
+  tag.style.cssText = themeColors[card.theme] || '';
+  tag.style.padding = '2px 8px';
+  tag.style.borderRadius = '4px';
+  tag.style.fontWeight = '600';
+  tag.style.fontSize = '10px';
+  document.getElementById('btn-ok').style.display = 'none';
+  document.getElementById('btn-ko').style.display = 'none';
+  document.getElementById('flash-progress').textContent = `${currentIdx + 1} / ${deck.length}`;
+  document.getElementById('score-ok').textContent = scores.ok;
+  document.getElementById('score-ko').textContent = scores.ko;
+  document.getElementById('score-left').textContent = deck.length - currentIdx - 1;
+}
+
+function revealCard() {
+  const fc = document.getElementById('flashcard');
+  if (fc.classList.contains('revealed')) return;
+  fc.classList.add('revealed');
+  document.getElementById('card-side').textContent = 'Réponse';
+  document.getElementById('btn-ok').style.display = 'inline-block';
+  document.getElementById('btn-ko').style.display = 'inline-block';
+}
+
+function nextCard() {
+  if (currentIdx < deck.length - 1) {
+    currentIdx++;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderCard();
+  }
+}
+
+function markCard(ok) {
+  if (ok) scores.ok++; else scores.ko++;
+  nextCard();
+}
+
+// === CHRONOLOGIE ===
+const TL_DATA = [
+  { date: '-10000', label: 'Premières traces de sédentarisation et d\'agriculture (Proche-Orient)', theme: 't5', key: false },
+  { date: '1648', label: 'Traités de Westphalie — bases du droit international moderne', theme: 't2', key: true },
+  { date: '1669', label: 'Ordonnance de Colbert sur la forêt française', theme: 't5', key: true },
+  { date: '1756', label: 'Début de la guerre de Sept ans — guerre réelle clausewitzienne', theme: 't2', key: true },
+  { date: '1763', label: 'Fin de la guerre de Sept ans', theme: 't2', key: false },
+  { date: '1769', label: 'Machine à vapeur (James Watt) — révolution industrielle', theme: 't5', key: true },
+  { date: '1792', label: 'Début des guerres révolutionnaires — guerre absolue', theme: 't2', key: true },
+  { date: '1815', label: 'Fin des guerres napoléoniennes', theme: 't2', key: false },
+  { date: '1827', label: 'Code forestier français', theme: 't5', key: true },
+  { date: '1830', label: 'Conquête de l\'Algérie par la France', theme: 't3', key: false },
+  { date: '1830', label: 'Minimum de la surface forestière en France', theme: 't5', key: false },
+  { date: '1859', label: '1er forage pétrolier au monde (Pennsylvanie)', theme: 't5', key: true },
+  { date: '1870', label: 'III\u1d49 République française [1870-1940]', theme: 't3', key: false },
+  { date: '1872', label: '1er parc naturel au monde — Yellowstone (USA)', theme: 't5', key: true },
+  { date: '1914', label: 'Déclenchement de la 1ère Guerre mondiale', theme: 't2', key: true },
+  { date: '1918', label: 'Armistice du 11 novembre', theme: 't2', key: true },
+  { date: '1919', label: 'Traité de Versailles — création de la SDN — débat historiographique ouvert (art. 231)', theme: 't3', key: true },
+  { date: '1939', label: 'Début de la 2e Guerre mondiale', theme: 't2', key: true },
+  { date: '8 mai 1945', label: 'Massacres de Sétif, Guelma et Kherrata (Algérie)', theme: 't3', key: true },
+  { date: '1945', label: 'Création de l\'ONU (Charte de San Francisco)', theme: 't2', key: true },
+  { date: 'nov. 1945', label: 'Procès de Nuremberg ouvre (se termine oct. 1946)', theme: 't3', key: true },
+  { date: '1947', label: 'Publication de Si c\'est un homme (Primo Levi)', theme: 't3', key: false },
+  { date: '1947', label: 'Musée d\'Auschwitz ouvre le 14 juin', theme: 't3', key: false },
+  { date: '1948', label: 'Casques bleus — force d\'interposition', theme: 't2', key: false },
+  { date: '1953', label: 'Yad Vashem ouvre à Jérusalem', theme: 't3', key: false },
+  { date: '1er nov. 1954', label: 'Toussaint rouge — début de la guerre d\'Algérie (FLN)', theme: 't3', key: true },
+  { date: '1956', label: 'Nuit et brouillard (Alain Resnais)', theme: 't3', key: false },
+  { date: '1958', label: '1er juin 1958 — de Gaulle investi, passage IV\u1d49\u2192V\u1d49 République', theme: 't3', key: true },
+  { date: '1960', label: 'Création des Parcs naturels nationaux en France', theme: 't5', key: true },
+  { date: '1961', label: 'Fritz Fischer publie sa thèse sur la responsabilité allemande', theme: 't3', key: true },
+  { date: '1961', label: 'Procès Eichmann à Jérusalem — fin du grand silence', theme: 't3', key: true },
+  { date: '17 oct. 1961', label: 'Répression de la manifestation algérienne à Paris (Papon)', theme: 't3', key: true },
+  { date: '1964', label: 'Création de l\'ONF (Office National des Forêts)', theme: 't5', key: true },
+  { date: '19 mars 1962', label: 'Accords d\'Évian — cessez-le-feu', theme: 't3', key: true },
+  { date: '5 juil. 1962', label: 'Indépendance de l\'Algérie', theme: 't3', key: true },
+  { date: '1967', label: 'Le Roy Ladurie — Histoire du climat depuis l\'an mil', theme: 't5', key: false },
+  { date: '1972', label: '1er Sommet de la Terre à Stockholm — CCNUCC', theme: 't5', key: true },
+  { date: '1987', label: 'Fondation d\'Al-Qaïda par Ben Laden en Afghanistan', theme: 't2', key: true },
+  { date: '1988', label: 'Création du GIEC par l\'ONU', theme: 't5', key: true },
+  { date: '1992', label: 'Ouverture des archives publiques françaises sur l\'Algérie', theme: 't3', key: false },
+  { date: '1993', label: 'Création du TPIY à La Haye', theme: 't3', key: true },
+  { date: '1993', label: 'Journée du 16 juillet — Rafle du Vél d\'Hiv', theme: 't3', key: false },
+  { date: '6 avril 1994', label: 'Attentat contre Habyarimana — début du génocide tutsi', theme: 't3', key: true },
+  { date: '4 juil. 1994', label: 'Prise de pouvoir FPR — fin des tueries (Rwanda)', theme: 't3', key: true },
+  { date: 'nov. 1994', label: 'Création du TPIR à Arusha (Tanzanie)', theme: 't3', key: true },
+  { date: '1995', label: 'Jacques Chirac — responsabilité de l\'État français (Vél d\'Hiv)', theme: 't3', key: true },
+  { date: '1995', label: '1ère COP à Berlin', theme: 't5', key: false },
+  { date: '1997', label: 'Protocole de Kyoto (COP 3) — refus du Sénat américain', theme: 't5', key: true },
+  { date: '1997', label: 'Kofi Annan secrétaire général de l\'ONU [1997-2006]', theme: 't2', key: true },
+  { date: '1998', label: 'Création de la CPI', theme: 't2', key: true },
+  { date: '1999', label: 'Loi reconnaissant l\'appellation "guerre d\'Algérie" en France', theme: 't3', key: false },
+  { date: '11 sept. 2001', label: 'Attentats d\'Al-Qaïda aux États-Unis', theme: 't2', key: true },
+  { date: '2002-2012', label: 'Tribunaux Gacaca au Rwanda', theme: 't3', key: true },
+  { date: '2006', label: 'Naissance de Daech en Irak', theme: 't2', key: true },
+  { date: '2 mai 2011', label: 'Ben Laden tué lors d\'un raid américain au Pakistan', theme: 't2', key: true },
+  { date: '2012', label: 'Christopher Clark publie Les Somnambules', theme: 't3', key: false },
+  { date: '2014', label: 'Daech proclame son califat — Al-Baghdadi', theme: 't2', key: true },
+  { date: '2015', label: 'Accords de Paris (COP 21)', theme: 't5', key: true },
+  { date: '13 nov. 2015', label: 'Attentats de Paris (Daech)', theme: 't2', key: true },
+  { date: '14 juil. 2016', label: 'Attentat de Nice (Daech)', theme: 't2', key: true },
+  { date: '2017', label: 'Trump retire les EU de l\'accord de Paris', theme: 't5', key: true },
+  { date: '2019', label: 'Daech perd son territoire — Al-Baghdadi tué', theme: 't2', key: true },
+  { date: '2021', label: 'Biden retour dans l\'accord de Paris / Rapport Stora sur la guerre d\'Algérie', theme: 't5', key: true },
+  { date: '2022', label: '6e Sommet de la Terre à Stockholm (50 ans) / Mémorial guerre d\'Algérie à Paris', theme: 't5', key: false },
+  { date: '2024', label: 'Commémorations 30 ans génocide rwandais — Paul Kagame réélu (4e mandat)', theme: 't3', key: false },
+  { date: 'janv. 2025', label: 'Trump retire à nouveau les EU des accords de Paris', theme: 't5', key: true },
+  { date: '2025', label: 'COP 30 à Bélem au Brésil', theme: 't5', key: true },
+];
+
+function buildTimeline(filter) {
+  const container = document.getElementById('timeline-container');
+  const data = filter === 'all' ? TL_DATA : TL_DATA.filter(e => e.theme === filter);
+  container.innerHTML = data.map(e => {
+    const badge = e.theme !== 'all' ? `<span class="tl-badge ${e.theme}">${e.theme === 't2' ? 'T2' : e.theme === 't3' ? 'T3' : 'T5'}</span>` : '';
+    return `<div class="tl-entry ${e.key ? 'key' : ''}">
+      <span class="tl-date ${e.key ? 'key' : ''}">${e.date}</span>
+      <span class="tl-text">${e.label}${badge}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterChron(filter, btn) {
+  document.querySelectorAll('.chron-tag-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildTimeline(filter);
+}
+
+// === NAVIGATION ===
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.nav-btn');
+  btns.forEach(b => { if (b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('active'); });
+  if (id === 'flash') { resetFlash(); }
+  if (id === 'chron') { buildTimeline('all'); }
+}
+
+function toggleAxe(header) {
+  const axe = header.closest('.axe');
+  axe.classList.toggle('open');
+}
+
+function toggleJalon(header) {
+  const jalon = header.closest('.jalon');
+  jalon.classList.toggle('open');
+}
+
+// Init
+buildTimeline('all');
+resetFlash();
+</script>
+</body>
+</html>
